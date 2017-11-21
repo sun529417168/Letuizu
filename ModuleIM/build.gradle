@@ -1,0 +1,77 @@
+println IsBuildMudle.toBoolean()
+if (IsBuildMudle.toBoolean()) {
+    apply plugin: 'com.android.application'
+} else {
+    apply plugin: 'com.android.library'
+}
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    signingConfigs {
+        config {
+            storeFile file("rong.key")
+            storePassword "Amigo123"
+            keyAlias "RongCloud"
+            keyPassword "Amigo123"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.config //for release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.config //for release
+        }
+    }
+    sourceSets {
+        main {
+            if (IsBuildMudle.toBoolean()) {
+                manifest.srcFile 'src/main/release/AndroidManifest.xml'
+                java.srcDirs += "src/main/release/java/";
+            } else {
+                manifest.srcFile 'src/main/debug/AndroidManifest.xml'
+                java.srcDirs += "src/main/debug/java/";
+            }
+        }
+    }
+    repositories {
+        flatDir {
+            dirs project(':Library').file('libs')
+        }
+    }
+    repositories {
+        flatDir { dirs 'aars' }
+    }
+}
+
+dependencies {
+    provided fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':Library')
+    //组件化跳转引用
+    annotationProcessor 'com.github.mzule.activityrouter:compiler:1.1.7'
+    compile 'com.facebook.stetho:stetho:1.4.1'
+    compile(name: 'HMS-SDK-2.4.0.300', ext: 'aar')
+    compile(name: 'ry-CallKit', ext: 'aar')
+    compile(name: 'ry-contactcard', ext: 'aar')
+    compile(name: 'ry-recognizer', ext: 'aar')
+    compile(name: 'ry-RedPacket', ext: 'aar')
+    compile(name: 'ry-sticker', ext: 'aar')
+    compile(name: 'ry-IMLib', ext: 'aar')
+    compile(name: 'ry-CallLib', ext: 'aar')
+    compile(name: 'ry-IMKit', ext: 'aar')
+}
